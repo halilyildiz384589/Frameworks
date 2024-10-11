@@ -1,0 +1,25 @@
+services:
+  quizzapp:
+    build: .
+    ports: #application adjusting
+      - "8109:8108"  # Host'tan konteynıra port yönlendirmesi - db docker içerisinde 8108 portunda çalışıyor
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/questiondb # questiondb adında bir database yi oluşturduk
+      - SPRING_DATASOURCE_USERNAME=keycloak_user #kullanıcı adı
+      - SPRING_DATASOURCE_PASSWORD=keycloak_password #kullanıcı şifresi
+    depends_on:
+      - db #database çalışmasını göre harekete geç
+
+  db: #database adjusting
+    image: postgres:latest
+    ports:
+      - "5436:5432"  # Host'tan konteynıra port yönlendirmesi 
+    environment:
+      - POSTGRES_USER=keycloak_user
+      - POSTGRES_PASSWORD=keycloak_password
+      - POSTGRES_DB=questiondb
+    volumes:
+      - db_data:/var/lib/postgresql/data  # Veri kalıcılığı için volume atadık
+
+volumes:
+  db_data:
